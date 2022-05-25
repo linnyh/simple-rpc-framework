@@ -2,6 +2,7 @@ package github.javaguide.loadbalance;
 
 import github.javaguide.remoting.dto.RpcRequest;
 import github.javaguide.utils.CollectionUtil;
+import org.apache.zookeeper.data.Stat;
 
 import java.util.List;
 
@@ -22,6 +23,8 @@ public abstract class AbstractLoadBalance implements LoadBalance {
         }
         return doSelect(serviceAddresses, rpcRequest);
     }
+
+
 
     protected abstract String doSelect(List<String> serviceAddresses, RpcRequest rpcRequest);
 

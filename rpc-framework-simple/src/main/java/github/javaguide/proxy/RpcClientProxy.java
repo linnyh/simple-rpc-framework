@@ -27,12 +27,13 @@ import java.util.concurrent.CompletableFuture;
  * @createTime 2020年05月10日 19:01:00
  */
 @Slf4j
-public class RpcClientProxy implements InvocationHandler {
+public class RpcClientProxy implements InvocationHandler { // 实现了InvacationHandler接口的代理对象
 
     private static final String INTERFACE_NAME = "interfaceName";
 
     /**
      * Used to send requests to the server.And there are two implementations: socket and netty
+     * RPC请求的传输对象，也即一个Netty客户端
      */
     private final RpcRequestTransport rpcRequestTransport;
     private final RpcServiceConfig rpcServiceConfig;
@@ -50,6 +51,7 @@ public class RpcClientProxy implements InvocationHandler {
 
     /**
      * get the proxy object
+     * 获取代理对象
      */
     @SuppressWarnings("unchecked")
     public <T> T getProxy(Class<T> clazz) {
@@ -59,12 +61,15 @@ public class RpcClientProxy implements InvocationHandler {
     /**
      * This method is actually called when you use a proxy object to call a method.
      * The proxy object is the object you get through the getProxy method.
+     * 实现InvocationHandler接口的方法
+     * 当你使用代理对象调用方法的时候实际会调用到这个方法
      */
-    @SneakyThrows
+    @SneakyThrows // 简化异常处理
     @SuppressWarnings("unchecked")
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) {
-        log.info("invoked method: [{}]", method.getName());
+        log.info("invoked method: [{}]", method.getName());  // 显示被调用的方法
+
         RpcRequest rpcRequest = RpcRequest.builder().methodName(method.getName())
                 .parameters(args)
                 .interfaceName(method.getDeclaringClass().getName())
@@ -73,18 +78,23 @@ public class RpcClientProxy implements InvocationHandler {
                 .group(rpcServiceConfig.getGroup())
                 .version(rpcServiceConfig.getVersion())
                 .build();
-        RpcResponse<Object> rpcResponse = null;
-        if (rpcRequestTransport instanceof NettyRpcClient) {
+        RpcResponse<Object> rpcResponse = null; // 服务端的答复对象
+        if (rpcRequestTransport instanceof NettyRpcClient) { // Netty实现的客户端
             CompletableFuture<RpcResponse<Object>> completableFuture = (CompletableFuture<RpcResponse<Object>>) rpcRequestTransport.sendRpcRequest(rpcRequest);
-            rpcResponse = completableFuture.get();
+            rpcResponse = completableFuture.get(); // 阻塞权交给了代理类的调用rpc方法线程中，而不是阻塞 发送请求的 eventloop 线程
         }
-        if (rpcRequestTransport instanceof SocketRpcClient) {
+        if (rpcRequestTransport instanceof SocketRpcClient) { // socket实现的客户端
             rpcResponse = (RpcResponse<Object>) rpcRequestTransport.sendRpcRequest(rpcRequest);
         }
         this.check(rpcResponse, rpcRequest);
         return rpcResponse.getData();
     }
 
+    /**
+     * 检查返回的response，包含对比请求ID与状态码
+     * @param rpcResponse
+     * @param rpcRequest
+     */
     private void check(RpcResponse<Object> rpcResponse, RpcRequest rpcRequest) {
         if (rpcResponse == null) {
             throw new RpcException(RpcErrorMessageEnum.SERVICE_INVOCATION_FAILURE, INTERFACE_NAME + ":" + rpcRequest.getInterfaceName());

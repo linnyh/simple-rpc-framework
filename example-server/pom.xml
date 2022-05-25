@@ -11,11 +11,13 @@
 
     <artifactId>example-server</artifactId>
     <dependencies>
+<!--        服务接口-->
         <dependency>
             <groupId>github.javaguide</groupId>
             <artifactId>hello-service-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+<!--        rpc框架-->
         <dependency>
             <groupId>github.javaguide</groupId>
             <artifactId>rpc-framework-simple</artifactId>

@@ -16,13 +16,13 @@ import java.util.List;
 
 /**
  * service discovery based on zookeeper
- *
+ * 基于zookeeper的服务发现
  * @author shuang.kou
  * @createTime 2020年06月01日 15:16:00
  */
 @Slf4j
 public class ZkServiceDiscoveryImpl implements ServiceDiscovery {
-    private final LoadBalance loadBalance;
+    private final LoadBalance loadBalance; // 负载均衡
 
     public ZkServiceDiscoveryImpl() {
         this.loadBalance = ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtension("loadBalance");
@@ -36,7 +36,7 @@ public class ZkServiceDiscoveryImpl implements ServiceDiscovery {
         if (CollectionUtil.isEmpty(serviceUrlList)) {
             throw new RpcException(RpcErrorMessageEnum.SERVICE_CAN_NOT_BE_FOUND, rpcServiceName);
         }
-        // load balancing
+        // load balancing 负载均衡，选择一个服务器
         String targetServiceUrl = loadBalance.selectServiceAddress(serviceUrlList, rpcRequest);
         log.info("Successfully found the service address:[{}]", targetServiceUrl);
         String[] socketAddressArray = targetServiceUrl.split(":");

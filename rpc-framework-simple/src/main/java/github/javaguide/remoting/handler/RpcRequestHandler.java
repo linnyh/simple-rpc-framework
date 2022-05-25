@@ -18,7 +18,7 @@ import java.lang.reflect.Method;
  */
 @Slf4j
 public class RpcRequestHandler {
-    private final ServiceProvider serviceProvider;
+    private final ServiceProvider serviceProvider; // 用于获取具体服务
 
     public RpcRequestHandler() {
         serviceProvider = SingletonFactory.getInstance(ZkServiceProviderImpl.class);
@@ -28,13 +28,13 @@ public class RpcRequestHandler {
      * Processing rpcRequest: call the corresponding method, and then return the method
      */
     public Object handle(RpcRequest rpcRequest) {
-        Object service = serviceProvider.getService(rpcRequest.getRpcServiceName());
-        return invokeTargetMethod(rpcRequest, service);
+        Object service = serviceProvider.getService(rpcRequest.getRpcServiceName()); // 获取服务 Class 对象
+        return invokeTargetMethod(rpcRequest, service); // 调用对应的方法
     }
 
     /**
      * get method execution results
-     *
+     * 获得方法的执行结果
      * @param rpcRequest client request
      * @param service    service object
      * @return the result of the target method execution

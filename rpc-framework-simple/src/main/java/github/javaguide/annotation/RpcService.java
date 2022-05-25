@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
 
 /**
  * RPC service annotation, marked on the service implementation class
+ * RPC 服务端注解，用于服务的实现类
  *
  * @author shuang.kou
  * @createTime 2020年07月21日 13:11:00

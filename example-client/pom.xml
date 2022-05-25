@@ -11,12 +11,14 @@
 
     <artifactId>example-client</artifactId>
     <dependencies>
+<!--        rpc框架-->
         <dependency>
             <groupId>github.javaguide</groupId>
             <artifactId>rpc-framework-simple</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+<!--        远程服务接口-->
         <dependency>
             <groupId>github.javaguide</groupId>
             <artifactId>hello-service-api</artifactId>

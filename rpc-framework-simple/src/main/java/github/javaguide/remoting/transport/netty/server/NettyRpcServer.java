@@ -5,6 +5,7 @@ import github.javaguide.config.RpcServiceConfig;
 import github.javaguide.factory.SingletonFactory;
 import github.javaguide.provider.ServiceProvider;
 import github.javaguide.provider.impl.ZkServiceProviderImpl;
+import github.javaguide.registry.zk.util.CuratorUtils;
 import github.javaguide.remoting.transport.netty.codec.RpcMessageDecoder;
 import github.javaguide.remoting.transport.netty.codec.RpcMessageEncoder;
 import github.javaguide.utils.RuntimeUtil;
@@ -24,10 +25,13 @@ import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultEventExecutorGroup;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.curator.framework.CuratorFramework;
 import org.springframework.stereotype.Component;
 
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Server. Receive the client message, call the corresponding method according to the client message,
@@ -40,11 +44,32 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class NettyRpcServer {
 
-    public static final int PORT = 9998;
+    public static final int PORT = 6666;
+
+    private AtomicInteger connectNum;
+
+    private String servicePath;
+
+    private String address;
+
+    private String path;
+
+    public NettyRpcServer() throws UnknownHostException {
+        this.connectNum = new AtomicInteger(0);
+        InetAddress addr = InetAddress.getLocalHost();
+        this.address = addr.getHostAddress() + ":" + PORT;
+    }
+
+    public void setServicePath(String servicePath) {
+        this.servicePath = servicePath;
+        this.path = "/my-rpc/" + servicePath + '/' + address;
+    }
 
     private final ServiceProvider serviceProvider = SingletonFactory.getInstance(ZkServiceProviderImpl.class);
+    private final CuratorFramework zkClient = CuratorUtils.getZkClient();
 
     public void registerService(RpcServiceConfig rpcServiceConfig) {
+        rpcServiceConfig.setData(String.valueOf(connectNum)); // 设置数据
         serviceProvider.publishService(rpcServiceConfig);
     }
 
@@ -52,6 +77,7 @@ public class NettyRpcServer {
     public void start() {
         CustomShutdownHook.getCustomShutdownHook().clearAll();
         String host = InetAddress.getLocalHost().getHostAddress();
+//        new Thread(this.updateConnectInfo).start(); // 定时发送负载数据
         EventLoopGroup bossGroup = new NioEventLoopGroup(1);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         DefaultEventExecutorGroup serviceHandlerGroup = new DefaultEventExecutorGroup(
@@ -75,10 +101,12 @@ public class NettyRpcServer {
                         protected void initChannel(SocketChannel ch) {
                             // 30 秒之内没有收到客户端请求的话就关闭连接
                             ChannelPipeline p = ch.pipeline();
+                            // 设置读超时时间为30秒，也即30秒内没有请求可读就触发userEventTriggered函数关闭连接
                             p.addLast(new IdleStateHandler(30, 0, 0, TimeUnit.SECONDS));
                             p.addLast(new RpcMessageEncoder());
                             p.addLast(new RpcMessageDecoder());
                             p.addLast(serviceHandlerGroup, new NettyRpcServerHandler());
+                            p.addLast(new ConnectServerHandler(connectNum, zkClient, path));
                         }
                     });
 

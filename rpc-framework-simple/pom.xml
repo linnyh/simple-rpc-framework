@@ -25,7 +25,7 @@
             <artifactId>kryo</artifactId>
             <version>${kryo.version}</version>
         </dependency>
-        <!--zookeeper-->
+        <!--zookeeper Netflix公司开源的一套zookeeper java客户端框架，相比于原生的来说其封装更加完善，各种api都可以比较方便地使用-->
         <dependency>
             <groupId>org.apache.curator</groupId>
             <artifactId>curator-framework</artifactId>

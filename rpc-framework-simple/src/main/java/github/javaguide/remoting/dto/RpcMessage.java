@@ -9,6 +9,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
+ * 用于传输的类，包装请求与回复信息
  * @author wangtao
  * @createTime 2020年10月2日 12:33
  */

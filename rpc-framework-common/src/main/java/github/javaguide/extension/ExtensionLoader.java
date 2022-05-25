@@ -55,13 +55,13 @@ public final class ExtensionLoader<T> {
         if (StringUtil.isBlank(name)) {
             throw new IllegalArgumentException("Extension name should not be null or empty.");
         }
-        // firstly get from cache, if not hit, create one
+        // firstly get from cache, if not hit, create one 从缓存中查看
         Holder<Object> holder = cachedInstances.get(name);
         if (holder == null) {
             cachedInstances.putIfAbsent(name, new Holder<>());
             holder = cachedInstances.get(name);
         }
-        // create a singleton if no instance exists
+        // create a singleton if no instance exists 缓存中不存在，新建一个单例
         Object instance = holder.get();
         if (instance == null) {
             synchronized (holder) {

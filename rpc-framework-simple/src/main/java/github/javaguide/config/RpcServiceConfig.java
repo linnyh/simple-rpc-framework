@@ -8,6 +8,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
+ * RPC服务配置类，包含服务版本号，组别，服务名称
  * @author shuang.kou
  * @createTime 2020年07月21日 20:23:00
  **/
@@ -31,6 +32,11 @@ public class RpcServiceConfig {
      * target service
      */
     private Object service;
+
+    /**
+     * 节点数据
+     */
+    private String data = "";
 
     public String getRpcServiceName() {
         return this.getServiceName() + this.getGroup() + this.getVersion();

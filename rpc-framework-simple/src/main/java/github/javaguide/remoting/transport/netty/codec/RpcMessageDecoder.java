@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Arrays;
 
 /**
- * custom protocol decoder
+ * custom protocol decoder 自定义的编码协议
  * <pre>
  *   0     1     2     3     4        5     6     7     8         9          10      11     12  13  14   15 16
  *   +-----+-----+-----+-----+--------+----+----+----+------+-----------+-------+----- --+-----+-----+-------+
@@ -86,6 +86,11 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
     }
 
 
+    /**
+     * 解碼，反序列化操作
+     * @param in
+     * @return
+     */
     private Object decodeFrame(ByteBuf in) {
         // note: must read ByteBuf in order
         checkMagicNumber(in);
@@ -123,7 +128,7 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
             Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class)
                     .getExtension(codecName);
             if (messageType == RpcConstants.REQUEST_TYPE) {
-                RpcRequest tmpValue = serializer.deserialize(bs, RpcRequest.class);
+                RpcRequest tmpValue = serializer.deserialize(bs, RpcRequest.class); // 反序列化
                 rpcMessage.setData(tmpValue);
             } else {
                 RpcResponse tmpValue = serializer.deserialize(bs, RpcResponse.class);

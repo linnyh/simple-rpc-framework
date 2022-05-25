@@ -4,6 +4,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 /**
+ * 传输协议的一些常数定义
  * @author wangtao .
  * @createTime on 2020/10/2
  */

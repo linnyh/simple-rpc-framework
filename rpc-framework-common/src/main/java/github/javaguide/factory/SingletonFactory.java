@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @createTime 2020年06月03日 15:04:00
  */
 public final class SingletonFactory {
-    private static final Map<String, Object> OBJECT_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, Object> OBJECT_MAP = new ConcurrentHashMap<>(); // 单例存放在map中
 
     private SingletonFactory() {
     }
@@ -21,12 +21,12 @@ public final class SingletonFactory {
             throw new IllegalArgumentException();
         }
         String key = c.toString();
-        if (OBJECT_MAP.containsKey(key)) {
-            return c.cast(OBJECT_MAP.get(key));
-        } else {
+        if (OBJECT_MAP.containsKey(key)) { // 在map中找到（命中）
+            return c.cast(OBJECT_MAP.get(key)); // cast()方法用于将指定的对象强制转换为此类的对象。该方法以对象形式转换后返回对象
+        } else { // 未命中则添加
             return c.cast(OBJECT_MAP.computeIfAbsent(key, k -> {
                 try {
-                    return c.getDeclaredConstructor().newInstance();
+                    return c.getDeclaredConstructor().newInstance(); // 用默认构造函数构造对象
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
                     throw new RuntimeException(e.getMessage(), e);
                 }

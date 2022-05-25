@@ -27,7 +27,7 @@ class ZkServiceRegistryImplTest {
         DemoRpcService demoRpcService = new DemoRpcServiceImpl();
         RpcServiceConfig rpcServiceConfig = RpcServiceConfig.builder()
                 .group("test2").version("version2").service(demoRpcService).build();
-        zkServiceRegistry.registerService(rpcServiceConfig.getRpcServiceName(), givenInetSocketAddress);
+        zkServiceRegistry.registerService(rpcServiceConfig.getRpcServiceName(), givenInetSocketAddress, "10");
         ServiceDiscovery zkServiceDiscovery = new ZkServiceDiscoveryImpl();
         RpcRequest rpcRequest = RpcRequest.builder()
 //                .parameters(args)

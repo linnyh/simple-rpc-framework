@@ -8,7 +8,7 @@ import java.lang.annotation.Annotation;
 
 /**
  * custom package scanner
- *
+ * 自定义包扫描器
  * @author shuang.kou
  * @createTime 2020年08月10日 21:42:00
  */
@@ -16,7 +16,7 @@ public class CustomScanner extends ClassPathBeanDefinitionScanner {
 
     public CustomScanner(BeanDefinitionRegistry registry, Class<? extends Annotation> annoType) {
         super(registry);
-        super.addIncludeFilter(new AnnotationTypeFilter(annoType));
+        super.addIncludeFilter(new AnnotationTypeFilter(annoType)); // 自定义过滤注解
     }
 
     @Override

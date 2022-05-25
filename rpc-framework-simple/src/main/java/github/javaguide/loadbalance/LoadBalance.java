@@ -2,6 +2,7 @@ package github.javaguide.loadbalance;
 
 import github.javaguide.extension.SPI;
 import github.javaguide.remoting.dto.RpcRequest;
+import org.apache.zookeeper.data.Stat;
 
 import java.util.List;
 
@@ -21,4 +22,5 @@ public interface LoadBalance {
      * @return target service address
      */
     String selectServiceAddress(List<String> serviceUrlList, RpcRequest rpcRequest);
+
 }

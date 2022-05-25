@@ -9,10 +9,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class HelloController {
 
+    // 远程服务
     @RpcReference(version = "version1", group = "test1")
     private HelloService helloService;
 
     public void test() throws InterruptedException {
+        // 调用 helloService.hello() 时会调用代理类的invoke方法
         String hello = this.helloService.hello(new Hello("111", "222"));
         //如需使用 assert 断言，需要在 VM options 添加参数：-ea
         assert "Hello description is 222".equals(hello);

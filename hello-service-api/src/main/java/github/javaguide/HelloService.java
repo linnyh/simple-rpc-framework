@@ -2,6 +2,7 @@ package github.javaguide;
 
 
 /**
+ * 服务接口
  * @author shuang.kou
  * @createTime 2020年05月10日 07:03:00
  */

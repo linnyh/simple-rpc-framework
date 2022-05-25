@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 
 /**
  * RPC reference annotation, autowire the service implementation class
- *
+ * 在本地控制层引用远程服务时，自动注入远程服务Bean，功能类似于@Autowire注解
  * @author smile2coder
  * @createTime 2020年09月16日 21:42:00
  */

@@ -11,6 +11,7 @@ import lombok.ToString;
 import java.io.Serializable;
 
 /**
+ * 服务端的回复信息类
  * @author shuang.kou
  * @createTime 2020年05月12日 16:15:00
  */

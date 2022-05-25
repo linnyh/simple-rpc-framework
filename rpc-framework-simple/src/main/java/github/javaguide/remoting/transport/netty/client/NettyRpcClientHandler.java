@@ -40,6 +40,7 @@ public class NettyRpcClientHandler extends ChannelInboundHandlerAdapter {
 
     /**
      * Read the message transmitted by the server
+     * 读取服务器发送的信息
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
@@ -48,11 +49,11 @@ public class NettyRpcClientHandler extends ChannelInboundHandlerAdapter {
             if (msg instanceof RpcMessage) {
                 RpcMessage tmp = (RpcMessage) msg;
                 byte messageType = tmp.getMessageType();
-                if (messageType == RpcConstants.HEARTBEAT_RESPONSE_TYPE) {
+                if (messageType == RpcConstants.HEARTBEAT_RESPONSE_TYPE) { // 接收到服务端对心跳请求的回应
                     log.info("heart [{}]", tmp.getData());
-                } else if (messageType == RpcConstants.RESPONSE_TYPE) {
+                } else if (messageType == RpcConstants.RESPONSE_TYPE) { // 接收到服务端对某请求的回应
                     RpcResponse<Object> rpcResponse = (RpcResponse<Object>) tmp.getData();
-                    unprocessedRequests.complete(rpcResponse);
+                    unprocessedRequests.complete(rpcResponse); // 接收到对应请求id，将该请求从未处理请求map中删除
                 }
             }
         } finally {
@@ -60,6 +61,12 @@ public class NettyRpcClientHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+    /**
+     * 该函数用来处理心跳超时时间，在IdleStateHandler设置超时时间，如果达到了就会直接调用这个方法发送心跳报文
+     * @param ctx
+     * @param evt
+     * @throws Exception
+     */
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
@@ -70,9 +77,9 @@ public class NettyRpcClientHandler extends ChannelInboundHandlerAdapter {
                 RpcMessage rpcMessage = new RpcMessage();
                 rpcMessage.setCodec(SerializationTypeEnum.PROTOSTUFF.getCode());
                 rpcMessage.setCompress(CompressTypeEnum.GZIP.getCode());
-                rpcMessage.setMessageType(RpcConstants.HEARTBEAT_REQUEST_TYPE);
+                rpcMessage.setMessageType(RpcConstants.HEARTBEAT_REQUEST_TYPE); // 设置请求类型为心跳请求
                 rpcMessage.setData(RpcConstants.PING);
-                channel.writeAndFlush(rpcMessage).addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
+                channel.writeAndFlush(rpcMessage).addListener(ChannelFutureListener.CLOSE_ON_FAILURE); // 发送心跳信息
             }
         } else {
             super.userEventTriggered(ctx, evt);

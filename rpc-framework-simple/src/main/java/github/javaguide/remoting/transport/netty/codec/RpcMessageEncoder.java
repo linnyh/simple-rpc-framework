@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
+ * 自定义RPC传输协议
  * <p>
  * custom protocol decoder
  * <p>
@@ -44,6 +45,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class RpcMessageEncoder extends MessageToByteEncoder<RpcMessage> {
     private static final AtomicInteger ATOMIC_INTEGER = new AtomicInteger(0);
 
+    /**
+     * 編碼，序列化操作
+     * @param ctx
+     * @param rpcMessage
+     * @param out
+     */
     @Override
     protected void encode(ChannelHandlerContext ctx, RpcMessage rpcMessage, ByteBuf out) {
         try {
@@ -67,7 +74,7 @@ public class RpcMessageEncoder extends MessageToByteEncoder<RpcMessage> {
                 log.info("codec name: [{}] ", codecName);
                 Serializer serializer = ExtensionLoader.getExtensionLoader(Serializer.class)
                         .getExtension(codecName);
-                bodyBytes = serializer.serialize(rpcMessage.getData());
+                bodyBytes = serializer.serialize(rpcMessage.getData()); // 序列化操作
                 // compress the bytes
                 String compressName = CompressTypeEnum.getName(rpcMessage.getCompress());
                 Compress compress = ExtensionLoader.getExtensionLoader(Compress.class)

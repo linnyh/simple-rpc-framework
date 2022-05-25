@@ -36,6 +36,11 @@ public class NettyRpcServerHandler extends ChannelInboundHandlerAdapter {
         this.rpcRequestHandler = SingletonFactory.getInstance(RpcRequestHandler.class);
     }
 
+    /**
+     * 读取客户端发来的信息
+     * @param ctx
+     * @param msg 客户端信息
+     */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         try {
@@ -45,12 +50,13 @@ public class NettyRpcServerHandler extends ChannelInboundHandlerAdapter {
                 RpcMessage rpcMessage = new RpcMessage();
                 rpcMessage.setCodec(SerializationTypeEnum.HESSIAN.getCode());
                 rpcMessage.setCompress(CompressTypeEnum.GZIP.getCode());
-                if (messageType == RpcConstants.HEARTBEAT_REQUEST_TYPE) {
+                if (messageType == RpcConstants.HEARTBEAT_REQUEST_TYPE) { // 是心跳信息
                     rpcMessage.setMessageType(RpcConstants.HEARTBEAT_RESPONSE_TYPE);
                     rpcMessage.setData(RpcConstants.PONG);
                 } else {
                     RpcRequest rpcRequest = (RpcRequest) ((RpcMessage) msg).getData();
                     // Execute the target method (the method the client needs to execute) and return the method result
+                    // RPC 请求处理，负责通过zookeeper获得调用服务端的被客户端调用的本地方法
                     Object result = rpcRequestHandler.handle(rpcRequest);
                     log.info(String.format("server get result: %s", result.toString()));
                     rpcMessage.setMessageType(RpcConstants.RESPONSE_TYPE);
@@ -71,11 +77,17 @@ public class NettyRpcServerHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+    /**
+     * 心跳机制，长时间客户端无请求就断开连接，避免资源浪费
+     * @param ctx
+     * @param evt
+     * @throws Exception
+     */
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
             IdleState state = ((IdleStateEvent) evt).state();
-            if (state == IdleState.READER_IDLE) {
+            if (state == IdleState.READER_IDLE) { // 读超时，断开与客户端的连接
                 log.info("idle check happen, so close the connection");
                 ctx.close();
             }
@@ -84,6 +96,11 @@ public class NettyRpcServerHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+    /**
+     * 异常处理，关闭服务
+     * @param ctx
+     * @param cause
+     */
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         log.error("server catch exception");

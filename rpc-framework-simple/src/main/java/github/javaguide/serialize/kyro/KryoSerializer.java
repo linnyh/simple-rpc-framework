@@ -58,5 +58,4 @@ public class KryoSerializer implements Serializer {
             throw new SerializeException("Deserialization failed");
         }
     }
-
 }
