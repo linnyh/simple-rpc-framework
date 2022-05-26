@@ -189,5 +189,16 @@ public final class CuratorUtils {
         }
     }
 
+    public static String getNodeData(String path, CuratorFramework zkClient) {
+        String data = null;
+        try {
+            Stat stat = new Stat();
+            data = new String(zkClient.getData().storingStatIn(stat).forPath(path));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return data;
+    }
+
 
 }

@@ -23,7 +23,7 @@ public class NettyServerMain {
         RpcServiceConfig rpcServiceConfig = RpcServiceConfig.builder()
                 .group("test2").version("version2").service(helloService2).build(); // 包装配置服务
         nettyRpcServer.registerService(rpcServiceConfig); // 将服务注册到注册中心
-        nettyRpcServer.setServicePath(rpcServiceConfig.getRpcServiceName());
+        nettyRpcServer.setServerConfig(rpcServiceConfig); // 服务保留它自己的配置信息
         nettyRpcServer.start(); // 启动服务
     }
 }

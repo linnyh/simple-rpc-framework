@@ -44,15 +44,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class NettyRpcServer {
 
-    public static final int PORT = 6666;
+    public static final int PORT = 9999;
 
-    private AtomicInteger connectNum;
+    private final AtomicInteger connectNum;
 
-    private String servicePath;
-
-    private String address;
+    private final String address;
 
     private String path;
+
+    private RpcServiceConfig rpcServiceConfig;
 
     public NettyRpcServer() throws UnknownHostException {
         this.connectNum = new AtomicInteger(0);
@@ -60,9 +60,9 @@ public class NettyRpcServer {
         this.address = addr.getHostAddress() + ":" + PORT;
     }
 
-    public void setServicePath(String servicePath) {
-        this.servicePath = servicePath;
-        this.path = "/my-rpc/" + servicePath + '/' + address;
+    public void setServerConfig(RpcServiceConfig config) {
+        this.rpcServiceConfig = config;
+        this.path = CuratorUtils.ZK_REGISTER_ROOT_PATH + '/' + this.rpcServiceConfig.getRpcServiceName() + '/' + address;
     }
 
     private final ServiceProvider serviceProvider = SingletonFactory.getInstance(ZkServiceProviderImpl.class);

@@ -5,6 +5,7 @@ import github.javaguide.utils.CollectionUtil;
 import org.apache.zookeeper.data.Stat;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Abstract class for a load balancing policy
@@ -27,5 +28,6 @@ public abstract class AbstractLoadBalance implements LoadBalance {
 
 
     protected abstract String doSelect(List<String> serviceAddresses, RpcRequest rpcRequest);
+    protected abstract String selectServiceAddress(Map<String, String> addresStatMap, RpcRequest rpcRequest);
 
 }
