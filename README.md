@@ -42,6 +42,7 @@
 - [x] **使用 Netty（基于 NIO）替代 BIO 实现网络传输；**
 - [x] **使用开源的序列化机制 Kyro（也可以用其它的）替代 JDK 自带的序列化机制；**
 - [x] **使用 Zookeeper 管理相关服务地址信息**
+- [ ] **使用 nacos 作为注册中心**
 - [x] Netty 重用 Channel 避免重复连接服务端
 - [x] 使用 `CompletableFuture` 包装接受客户端返回结果（之前的实现是通过 `AttributeMap` 绑定到 Channel 上实现的） 详见：[使用 CompletableFuture 优化接受服务提供端返回结果](./docs/使用CompletableFuture优化接受服务提供端返回结果.md)
 - [x] **增加 Netty 心跳机制** : 保证客户端和服务端的连接不被断掉，避免重连。
@@ -207,45 +208,4 @@ HelloService helloService = rpcClientProxy.getProxy(HelloService.class);
 String hello = helloService.hello(new Hello("111", "222"));
 System.out.println(hello);
 ```
-
-## 相关问题
-
-### 为什么要造这个轮子？Dubbo 不香么？
-
-写这个 RPC 框架主要是为了通过造轮子的方式来学习，检验自己对于自己所掌握的知识的运用。
-
-实现一个简单的 RPC 框架实际是比较容易的，不过，相比于手写 AOP 和 IoC 还是要难一点点，前提是你搞懂了 RPC 的基本原理。
-
-我之前从理论层面在我的知识星球分享过如何实现一个 RPC。不过理论层面的东西只是支撑，你看懂了理论可能只能糊弄住面试官。咱程序员这一行还是最需要动手能力，即使你是架构师级别的人物。当你动手去实践某个东西，将理论付诸实践的时候，你就会发现有很多坑等着你。
-
-大家在实际项目上还是要尽量少造轮子，有优秀的框架之后尽量就去用，Dubbo 在各个方面做的都比较好和完善。
-
-### 如果我要自己写的话，需要提前了解哪些知识
-
-**Java** ：
-
-1. 动态代理机制；
-2. 序列化机制以及各种序列化框架的对比，比如 hession2、kyro、protostuff。
-3. 线程池的使用；
-4. `CompletableFuture` 的使用
-5. ......
-
-**Netty** ：
-
-1. 使用 Netty 进行网络传输；
-2. `ByteBuf` 介绍
-3. Netty 粘包拆包
-4. Netty 长连接和心跳机制
-
-**Zookeeper** :
-
-1. 基本概念；
-2. 数据结构；
-3. 如何使用 Netflix 公司开源的 zookeeper 客户端框架 Curator 进行增删改查；
-
-## 教程
-
-Guide 的星球正在更新《从零开始手把手教你实现一个简单的 RPC 框架》。扫描下方二维码关注“**JavaGuide**”后回复 “**星球**”即可。
-
-![我的公众号](https://my-blog-to-use.oss-cn-beijing.aliyuncs.com/2019-6/167598cd2e17b8ec.png)
 
