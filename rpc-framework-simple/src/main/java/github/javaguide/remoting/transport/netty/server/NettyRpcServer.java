@@ -78,8 +78,8 @@ public class NettyRpcServer {
         CustomShutdownHook.getCustomShutdownHook().clearAll();
         String host = InetAddress.getLocalHost().getHostAddress();
 //        new Thread(this.updateConnectInfo).start(); // 定时发送负载数据
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+        EventLoopGroup bossGroup = new NioEventLoopGroup(1); // 主reactor 线程组
+        EventLoopGroup workerGroup = new NioEventLoopGroup(); // 从reactor线程组
         DefaultEventExecutorGroup serviceHandlerGroup = new DefaultEventExecutorGroup(
                 RuntimeUtil.cpus() * 2,
                 ThreadPoolFactoryUtil.createThreadFactory("service-handler-group", false)
@@ -106,7 +106,7 @@ public class NettyRpcServer {
                             p.addLast(new RpcMessageEncoder());
                             p.addLast(new RpcMessageDecoder());
                             p.addLast(serviceHandlerGroup, new NettyRpcServerHandler());
-                            p.addLast(new ConnectServerHandler(connectNum, zkClient, path));
+                            p.addLast(new ConnectServerHandler(connectNum, zkClient, path)); // 统计连接数
                         }
                     });
 

@@ -1,38 +1,16 @@
-# guide-rpc-framework
+# Simple Rpc Framework
 
-> [该 RPC 框架配套教程已经更新在我的星球，点击此链接了解详情。](https://javaguide.cn/zhuanlan/handwritten-rpc-framework.html)
-
-<div align="center">
-  <p> 中文| <a href="./README-EN.md">English</a>
-  </p>
-  <p>
-    <a href="https://github.com/Snailclimb/guide-rpc-framework">Github</a> | <a href="https://gitee.com/SnailClimb/guide-rpc-framework ">Gitee</a>
-  </p>
-</div>
-
-## 前言
-
-虽说 RPC 的原理实际不难，但是，自己在实现的过程中自己也遇到了很多问题。[guide-rpc-framework](https://github.com/Snailclimb/guide-rpc-framework) 目前只实现了 RPC 框架最基本的功能，一些可优化点都在下面提到了，有兴趣的小伙伴可以自行完善。
-
-通过这个简易的轮子，你可以学到 RPC 的底层原理和原理以及各种 Java 编码实践的运用。
-
-你甚至可以把 [guide-rpc-framework](https://github.com/Snailclimb/guide-rpc-framework) 当做你的毕设/项目经验的选择，这是非常不错！对比其他求职者的项目经验都是各种系统，造轮子肯定是更加能赢得面试官的青睐。
-
-如果你要将 [guide-rpc-framework](https://github.com/Snailclimb/guide-rpc-framework) 当做你的毕设/项目经验的话，我希望你一定要搞懂，而不是直接复制粘贴我的思想。你可以 fork 我的项目，然后进行优化。如果你觉得的优化是有价值的话，你可以提交 PR 给我，我会尽快处理。
 
 ## 介绍
 
- [guide-rpc-framework](https://github.com/Snailclimb/guide-rpc-framework) 是一款基于 Netty+Kyro+Zookeeper 实现的 RPC 框架。代码注释详细，结构清晰，并且集成了 Check Style 规范代码结构，非常适合阅读和学习。
-
-由于 Guide哥自身精力和能力有限，如果大家觉得有需要改进和完善的地方的话，欢迎 fork 本项目，然后 clone 到本地，在本地修改后提交 PR 给我，我会在第一时间 Review 你的代码。
-
+ [simple-rpc-framework](https://github.com/Snailclimb/guide-rpc-framework) 是一款基于 Netty+Kyro+Zookeeper 实现的 RPC 框架。
 **我们先从一个基本的 RPC 框架设计思路说起！**
 
 ### 一个基本的 RPC 框架设计思路
 
 > **注意** ：我们这里说的 RPC 框架指的是：可以让客户端直接调用服务端方法就像调用本地方法一样简单的框架，比如我前面介绍的 Dubbo、Motan、gRPC 这些。 如果需要和 HTTP 协议打交道，解析和封装 HTTP 请求和响应。这类框架并不能算是“RPC 框架”，比如 Feign。
 
-一个最简单的 RPC 框架使用示意图如下图所示,这也是 [guide-rpc-framework](https://github.com/Snailclimb/guide-rpc-framework) 目前的架构 ：
+一个最简单的 RPC 框架使用示意图如下图所示,这也是这个项目目前的架构 ：
 
 ![](./images/rpc-architure.png)
 

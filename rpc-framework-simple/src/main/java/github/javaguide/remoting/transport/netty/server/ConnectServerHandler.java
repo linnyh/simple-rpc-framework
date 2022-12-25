@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * @author Lin YuHang
  * @date 2022/5/25 10:47
+ * 当哟新的连接时，会更新Znode节点信息
  */
 @Slf4j
 public class ConnectServerHandler extends ChannelInboundHandlerAdapter {
@@ -28,9 +29,7 @@ public class ConnectServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRegistered(ChannelHandlerContext channelHandlerContext) throws Exception {
         super.channelRegistered(channelHandlerContext);
-        if (connectNum.incrementAndGet() % 100 == 0) {
-            log.info("当前连接数[{}]", connectNum.get());
-        }
+        connectNum.incrementAndGet(); // 新增连接
         CuratorUtils.setNodeData(this.path, connectNum.toString(), zkClient);
         log.info("当前连接数[{}]", connectNum.get());
     }
@@ -38,9 +37,7 @@ public class ConnectServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelUnregistered(ChannelHandlerContext channelHandlerContext) throws Exception {
         super.channelUnregistered(channelHandlerContext);
-        if (connectNum.decrementAndGet() % 100 == 0) {
-            log.info("当前链接数[{}]", connectNum.get());
-        }
+        connectNum.decrementAndGet(); // 减少连接
         CuratorUtils.setNodeData(this.path, connectNum.toString(), zkClient);
         log.info("当前链接数[{}]", connectNum.get());
     }

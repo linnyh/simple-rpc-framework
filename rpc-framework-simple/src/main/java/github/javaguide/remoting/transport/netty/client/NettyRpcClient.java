@@ -32,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.net.InetSocketAddress;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * initialize and close Bootstrap object
@@ -46,11 +47,12 @@ public final class NettyRpcClient implements RpcRequestTransport {
     private final ChannelProvider channelProvider;
     private final Bootstrap bootstrap;
     private final EventLoopGroup eventLoopGroup;
+    private final AtomicInteger reconnectNum = new AtomicInteger(0); // 重连计数器
 
     public NettyRpcClient() {
         // initialize resources such as EventLoopGroup, Bootstrap
-        eventLoopGroup = new NioEventLoopGroup();
-        bootstrap = new Bootstrap();
+        eventLoopGroup = new NioEventLoopGroup(); // 时间循环组，默认线程数为 2 * cpu核心数
+        bootstrap = new Bootstrap(); // 服务端用 ServerBootstrap()
         bootstrap.group(eventLoopGroup)
                 .channel(NioSocketChannel.class)
                 .handler(new LoggingHandler(LogLevel.INFO))
@@ -82,13 +84,20 @@ public final class NettyRpcClient implements RpcRequestTransport {
      */
     @SneakyThrows
     public Channel doConnect(InetSocketAddress inetSocketAddress) {
+        if (reconnectNum.get() > 3) {
+            throw new IllegalStateException();
+        }
         CompletableFuture<Channel> completableFuture = new CompletableFuture<>();
         bootstrap.connect(inetSocketAddress).addListener((ChannelFutureListener) future -> { // 监听结果的回调函数
             if (future.isSuccess()) {
-                log.info("The client has connected [{}] successful!", inetSocketAddress.toString());
+                log.info("客户端经过[{}]次尝试，成功连接到 [{}] !", reconnectNum.getAndSet(0), inetSocketAddress.toString());
                 completableFuture.complete(future.channel());
-            } else {
-                throw new IllegalStateException();
+            } else { // 链接失败，重试
+//                throw new IllegalStateException();
+                log.info("客户端连接服务器失败，5秒后尝试第[{}]次重新连接服务器！", reconnectNum.incrementAndGet());
+                future.channel().eventLoop().schedule(() -> {
+                    doConnect(inetSocketAddress);
+                }, 5, TimeUnit.SECONDS);
             }
         });
         return completableFuture.get();
@@ -103,24 +112,24 @@ public final class NettyRpcClient implements RpcRequestTransport {
     public Object sendRpcRequest(RpcRequest rpcRequest) {
         // build return value 构建一个新的返回用来接收服务器返回
         CompletableFuture<RpcResponse<Object>> resultFuture = new CompletableFuture<>();
-        // get server address 服务发现，获取服务地址
+        // get server address 服务发现，通过负载均衡算法获取服务地址
         InetSocketAddress inetSocketAddress = serviceDiscovery.lookupService(rpcRequest);
         // get  server address related channel 连接服务端，获取服务地址的相关通道
         Channel channel = getChannel(inetSocketAddress);
         if (channel.isActive()) {
-            // put unprocessed request
-            unprocessedRequests.put(rpcRequest.getRequestId(), resultFuture); // 请求被发送前，将其放入未处理请求map
+            // put unprocessed request 异步
+            unprocessedRequests.put(rpcRequest.getRequestId(), resultFuture); // 请求被发送前，将其放入未处理请求map，requestId是唯一的
             RpcMessage rpcMessage = RpcMessage.builder().data(rpcRequest) // 封装请求信息
                     .codec(SerializationTypeEnum.HESSIAN.getCode())
                     .compress(CompressTypeEnum.GZIP.getCode())
                     .messageType(RpcConstants.REQUEST_TYPE).build();
             channel.writeAndFlush(rpcMessage).addListener((ChannelFutureListener) future -> { // 发送信息，添加处理返回的回调函数监听返回
-                if (future.isSuccess()) {
-                    log.info("client send message: [{}]", rpcMessage);
-                } else {
+                if (future.isSuccess()) { // 链接成功
+                    log.info("客户端成功发送信息: [{}]", rpcMessage);
+                } else { // 连接失败，关闭通道
                     future.channel().close();
                     resultFuture.completeExceptionally(future.cause());
-                    log.error("Send failed:", future.cause());
+                    log.error("客户端发送信息失败：", future.cause());
                 }
             });
         } else {
@@ -132,7 +141,7 @@ public final class NettyRpcClient implements RpcRequestTransport {
 
     public Channel getChannel(InetSocketAddress inetSocketAddress) {
         Channel channel = channelProvider.get(inetSocketAddress); // 从 channelProvider 中查看是否已经有该channel
-        if (channel == null) { // 如果没有，重新连接
+        if (channel == null) { // 如果没有，重新连接服务端获得channel
             channel = doConnect(inetSocketAddress); // 连接服务端
             channelProvider.set(inetSocketAddress, channel); // 将通道注册到channelProvider
         }

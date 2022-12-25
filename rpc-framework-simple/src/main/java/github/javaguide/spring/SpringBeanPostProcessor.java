@@ -54,7 +54,7 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
     }
 
     /**
-     * Spring Bean 初始化方法调用前被调用, 发布服务
+     * Spring Bean 实例化前被调用, 发布服务
      * @param bean
      * @param beanName
      * @return
@@ -73,13 +73,13 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
                     .version(rpcService.version())
                     .data("0")
                     .service(bean).build();
-            serviceProvider.publishService(rpcServiceConfig); // 发布服务，ZkRegistry
+            serviceProvider.publishService(rpcServiceConfig); // 发布服务到zookeeper中，ZkRegistry
         }
         return bean;
     }
 
     /**
-     * Spring Bean 初始化方法调用之后调用这个方法, 创建客户端动态代理对象
+     * Spring Bean 实例化后调用这个方法, 创建客户端动态代理对象
      * @param bean
      * @param beanName
      * @return
@@ -104,7 +104,6 @@ public class SpringBeanPostProcessor implements BeanPostProcessor {
                     e.printStackTrace();
                 }
             }
-
         }
         return bean;
     }

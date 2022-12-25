@@ -17,10 +17,10 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@Import(CustomScannerRegistrar.class) // 使用Import导入自定义实现了ImportBeanDefinitionRegistrar接口的扫描类
+// 使用Import导入自定义实现了ImportBeanDefinitionRegistrar接口的扫描类
+@Import(CustomScannerRegistrar.class)
 @Documented
 public @interface RpcScan {
-
     String[] basePackage(); // 指定被扫描的包路径
-
 }
+

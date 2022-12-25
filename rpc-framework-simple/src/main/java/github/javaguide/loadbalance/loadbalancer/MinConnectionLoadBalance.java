@@ -1,7 +1,6 @@
 package github.javaguide.loadbalance.loadbalancer;
 
 import github.javaguide.loadbalance.AbstractLoadBalance;
-import github.javaguide.loadbalance.LoadBalance;
 import github.javaguide.registry.zk.util.CuratorUtils;
 import github.javaguide.remoting.dto.RpcRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +46,7 @@ public class MinConnectionLoadBalance extends AbstractLoadBalance {
     }
 
     @Override
-    protected String selectServiceAddress(Map<String, String> addresStatMap, RpcRequest rpcRequest) {
+    protected String selectServiceAddress(Map<String, String> addressStatMap, RpcRequest rpcRequest) {
         return null;
     }
 

@@ -28,6 +28,6 @@ public abstract class AbstractLoadBalance implements LoadBalance {
 
 
     protected abstract String doSelect(List<String> serviceAddresses, RpcRequest rpcRequest);
-    protected abstract String selectServiceAddress(Map<String, String> addresStatMap, RpcRequest rpcRequest);
+    protected abstract String selectServiceAddress(Map<String, String> addressStatMap, RpcRequest rpcRequest);
 
 }

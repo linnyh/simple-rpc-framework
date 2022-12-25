@@ -79,12 +79,12 @@ public class RpcMessageEncoder extends MessageToByteEncoder<RpcMessage> {
                 String compressName = CompressTypeEnum.getName(rpcMessage.getCompress());
                 Compress compress = ExtensionLoader.getExtensionLoader(Compress.class)
                         .getExtension(compressName);
-                bodyBytes = compress.compress(bodyBytes);
+                bodyBytes = compress.compress(bodyBytes); // 压缩
                 fullLength += bodyBytes.length;
             }
 
             if (bodyBytes != null) {
-                out.writeBytes(bodyBytes);
+                out.writeBytes(bodyBytes); // 写入携带的数据
             }
             int writeIndex = out.writerIndex();
             out.writerIndex(writeIndex - fullLength + RpcConstants.MAGIC_NUMBER.length + 1);

@@ -9,5 +9,5 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface SPI {
+public @interface SPI { // 模仿dubbo的SPI注解
 }

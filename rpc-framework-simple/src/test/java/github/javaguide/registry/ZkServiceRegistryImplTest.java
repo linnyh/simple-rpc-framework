@@ -7,9 +7,12 @@ import github.javaguide.registry.zk.ZkServiceDiscoveryImpl;
 import github.javaguide.registry.zk.ZkServiceRegistryImpl;
 import github.javaguide.remoting.dto.RpcRequest;
 import org.junit.jupiter.api.Test;
+import sun.awt.image.ImageWatched;
 
 import java.net.InetSocketAddress;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -19,6 +22,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * @createTime 2020年05月31日 16:25:00
  */
 class ZkServiceRegistryImplTest {
+    List<String> list = new ArrayList<>();
+    List<String> list1 = new Vector<>();
+    List<String> list2 = new LinkedList<>();
+    Map<String, String> m = new ConcurrentHashMap<>();
+
+    Set<String> set = new HashSet<>();
+    SortedSet<String> sset = new TreeSet<>();
+//    ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor();
+//    ClassLoader cl = new ClassLoader() {
+//    }
 
     @Test
     void should_register_service_successful_and_lookup_service_by_service_name() {

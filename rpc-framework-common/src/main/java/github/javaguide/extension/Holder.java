@@ -2,7 +2,7 @@ package github.javaguide.extension;
 
 public class Holder<T> {
 
-    private volatile T value;
+    private volatile T value; // 对其他线程可见
 
     public T get() {
         return value;

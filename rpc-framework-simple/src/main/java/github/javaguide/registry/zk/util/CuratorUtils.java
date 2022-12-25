@@ -146,7 +146,7 @@ public final class CuratorUtils {
             PathChildrenCacheEvent.Type type = pathChildrenCacheEvent.getType();
             // 若类型为数据修改
             if (type.equals(PathChildrenCacheEvent.Type.CHILD_UPDATED)) {
-                log.info("Service info changed[{}]", pathChildrenCacheEvent.toString());
+                log.info("服务信息被更新[{}]", pathChildrenCacheEvent.getData().toString());
             }
         };
         pathChildrenCache.getListenable().addListener(pathChildrenCacheListener); // 添加监听器,用于更新服务地址列表

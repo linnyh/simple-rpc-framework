@@ -27,14 +27,14 @@ public class RpcRequestHandler {
     /**
      * Processing rpcRequest: call the corresponding method, and then return the method
      */
-    public Object handle(RpcRequest rpcRequest) {
+    public Object handle(RpcRequest rpcRequest) { // 将请求转为函数调用
         Object service = serviceProvider.getService(rpcRequest.getRpcServiceName()); // 获取服务 Class 对象
         return invokeTargetMethod(rpcRequest, service); // 调用对应的方法
     }
 
     /**
      * get method execution results
-     * 获得方法的执行结果
+     * 通过反射调用函数，获得函数的执行结果
      * @param rpcRequest client request
      * @param service    service object
      * @return the result of the target method execution
@@ -42,12 +42,12 @@ public class RpcRequestHandler {
     private Object invokeTargetMethod(RpcRequest rpcRequest, Object service) {
         Object result;
         try {
-            Method method = service.getClass().getMethod(rpcRequest.getMethodName(), rpcRequest.getParamTypes());
-            result = method.invoke(service, rpcRequest.getParameters());
+            Method method = service.getClass().getMethod(rpcRequest.getMethodName(), rpcRequest.getParamTypes()); // 获取对应函数接口
+            result = method.invoke(service, rpcRequest.getParameters()); // 反射调用该函数
             log.info("service:[{}] successful invoke method:[{}]", rpcRequest.getInterfaceName(), rpcRequest.getMethodName());
         } catch (NoSuchMethodException | IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
             throw new RpcException(e.getMessage(), e);
         }
-        return result;
+        return result; // 返回结果
     }
 }

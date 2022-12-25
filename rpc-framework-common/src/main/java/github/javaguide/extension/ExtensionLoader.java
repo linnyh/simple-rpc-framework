@@ -15,43 +15,49 @@ import java.util.concurrent.ConcurrentHashMap;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
+ * 对 SPI 机制的应用
  * refer to dubbo spi: https://dubbo.apache.org/zh-cn/docs/source_code_guide/dubbo-spi.html
  */
+
 @Slf4j
 public final class ExtensionLoader<T> {
 
-    private static final String SERVICE_DIRECTORY = "META-INF/extensions/";
-    private static final Map<Class<?>, ExtensionLoader<?>> EXTENSION_LOADERS = new ConcurrentHashMap<>();
+    /**
+     * 这三个是所有拓展类加载器实例所共有的
+     */
+    private static final String SERVICE_DIRECTORY = "META-INF/extensions/"; // 配置文件路径
+    private static final Map<Class<?>, ExtensionLoader<?>> EXTENSION_LOADERS = new ConcurrentHashMap<>(); // 不同类型的扩展类加载器
     private static final Map<Class<?>, Object> EXTENSION_INSTANCES = new ConcurrentHashMap<>();
 
+    // Holder 为不可变的对象提供一个可变的包装
     private final Class<?> type;
-    private final Map<String, Holder<Object>> cachedInstances = new ConcurrentHashMap<>();
-    private final Holder<Map<String, Class<?>>> cachedClasses = new Holder<>();
+    private final Map<String, Holder<Object>> cachedInstances = new ConcurrentHashMap<>(); // 实例缓存，全限定性类名：holder里面的value就是实现类的实例
+    private final Holder<Map<String, Class<?>>> cachedClasses = new Holder<>(); // 持有者类，存储实现类对应的Class对象
 
     private ExtensionLoader(Class<?> type) {
         this.type = type;
     }
 
-    public static <S> ExtensionLoader<S> getExtensionLoader(Class<S> type) {
-        if (type == null) {
+    public static <S> ExtensionLoader<S> getExtensionLoader(Class<S> type) { // 获取指定类型的扩展类加载器
+        if (type == null) { // 必须不为 null
             throw new IllegalArgumentException("Extension type should not be null.");
         }
-        if (!type.isInterface()) {
+        if (!type.isInterface()) { // 必须是接口
             throw new IllegalArgumentException("Extension type must be an interface.");
         }
-        if (type.getAnnotation(SPI.class) == null) {
+        if (type.getAnnotation(SPI.class) == null) { // 必须由SPI注解
             throw new IllegalArgumentException("Extension type must be annotated by @SPI");
         }
         // firstly get from cache, if not hit, create one
         ExtensionLoader<S> extensionLoader = (ExtensionLoader<S>) EXTENSION_LOADERS.get(type);
-        if (extensionLoader == null) {
+        if (extensionLoader == null) { // 没有指定类的加载器就创建一个新的
             EXTENSION_LOADERS.putIfAbsent(type, new ExtensionLoader<S>(type));
             extensionLoader = (ExtensionLoader<S>) EXTENSION_LOADERS.get(type);
         }
         return extensionLoader;
     }
 
-    public T getExtension(String name) {
+    public T getExtension(String name) { // 根据实现类的全限定性类名获取对象
         if (StringUtil.isBlank(name)) {
             throw new IllegalArgumentException("Extension name should not be null or empty.");
         }
@@ -112,10 +118,10 @@ public final class ExtensionLoader<T> {
     }
 
     private void loadDirectory(Map<String, Class<?>> extensionClasses) {
-        String fileName = ExtensionLoader.SERVICE_DIRECTORY + type.getName();
+        String fileName = ExtensionLoader.SERVICE_DIRECTORY + type.getName(); // 配置文件名
         try {
             Enumeration<URL> urls;
-            ClassLoader classLoader = ExtensionLoader.class.getClassLoader();
+            ClassLoader classLoader = ExtensionLoader.class.getClassLoader();  // jdk类加载器
             urls = classLoader.getResources(fileName);
             if (urls != null) {
                 while (urls.hasMoreElements()) {
@@ -154,7 +160,6 @@ public final class ExtensionLoader<T> {
                         log.error(e.getMessage());
                     }
                 }
-
             }
         } catch (IOException e) {
             log.error(e.getMessage());

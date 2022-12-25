@@ -53,6 +53,7 @@ public class NettyRpcClientHandler extends ChannelInboundHandlerAdapter {
                     log.info("heart [{}]", tmp.getData());
                 } else if (messageType == RpcConstants.RESPONSE_TYPE) { // 接收到服务端对某请求的回应
                     RpcResponse<Object> rpcResponse = (RpcResponse<Object>) tmp.getData();
+                    // 把服务端响应交给 unprocessedRequests
                     unprocessedRequests.complete(rpcResponse); // 接收到对应请求id，将该请求从未处理请求map中删除
                 }
             }
